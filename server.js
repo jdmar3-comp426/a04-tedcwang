@@ -29,7 +29,7 @@ app.post("/app/new", (req, res) => {
 	const stmt = db.prepare("INSERT INTO userinfo (user, pass) VALUES (?, ?)");
 	const info = stmt.run(req.body.user, md5(req.body.pass));
 	if (info.changes === 1) {
-		res.status(201).json({"message":"One record created: ID " + info.lastInsertRowid + " (201)"})
+		res.status(201).json({"message":"1 record created: ID " + info.lastInsertRowid + " (201)"})
 	} else {
 		res.status(409).json({"message":"User already exists. (409)"})
 	}
@@ -54,10 +54,10 @@ app.get("/app/user/:id", (req, res) => {
 
 // UPDATE a single user (HTTP method PATCH) at endpoint /app/update/user/:id
 app.patch("/app/update/user/:id", (req, res) => {
-	const stmt = db.prepare("UPDATE userinfo SET user = COALESCE(?, user), pass = COALESCE(?, pass) WHERE id = ?");
+	const stmt = db.prepare("UPDATE userinfo SET user = COALESCE(?,user), pass = COALESCE(?,pass) WHERE id = ?");
 	const info = stmt.run(req.body.user, md5(req.body.pass), req.params.id);
 	if (info.changes === 1) {
-		res.status(200).json({"message":"One record update: ID " + req.params.id + " (200)"})
+		res.status(200).json({"message":"1 record updated: ID " + req.params.id + " (200)"})
 	} else {
 		res.status(404).json({"message":"User does not exist. (404)"})
 	}
@@ -68,7 +68,7 @@ app.delete("/app/delete/user/:id", (req, res) => {
 	const stmt = db.prepare("DELETE FROM userinfo WHERE id = ?");
 	const info = stmt.run(req.params.id);
 	if (info.changes === 1) {
-		res.status(200).json({"message":"One record deleted: ID " + req.params.id + " (200"})
+		res.status(200).json({"message":"1 record deleted: ID " + req.params.id + " (200)"})
 	} else {
 		res.status(404).json({"message":"User does not exist. (404)"})
 	}
