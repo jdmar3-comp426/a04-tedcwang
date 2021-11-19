@@ -17,13 +17,6 @@ app.listen(HTTP_PORT, () => {
     console.log("Server running on port %PORT%".replace("%PORT%",HTTP_PORT))
 });
 
-//
-app.get("/", (req, res, next) => {
-	res.json({"message":"Your APII works! (200)"});
-	res.status(200);
-}
-)
-
 // READ (HTTP method GET) at root endpoint /app/
 app.get("/app/", (req, res, next) => {
     res.json({"message":"Your API works! (200)"});
@@ -35,10 +28,10 @@ app.get("/app/", (req, res, next) => {
 app.post("/app/new", (req, res) => {
 	const stmt = db.prepare('INSERT INTO userinfo (user, pass) VALUES (?, ?');
 	const info = stmt.run(req.body.user, md5(req.body.pass));
-	if (IIRFilterNode.changes === 1) {
+	if (info.changes === 1) {
 		res.status(201).json({"message":"One record created: ID " + info.lastInsertRowid + " (201"})
 	} else {
-		res.status(409).json({"message":"User already exists. (409"})
+		res.status(409).json({"message":"User already exists. (404)"})
 	}
 })
 
@@ -51,17 +44,17 @@ app.get("/app/users", (req, res) => {
 // READ a single user (HTTP method GET) at endpoint /app/user/:id
 app.get("/app/user/:id", (req, res) => {
 	const stmt = db.prepare("SELECT * FROM userinfo WHERE id = ?");
-	const productR = stmt.get(req.params.id);
-	if (result === undefined) {
+	const info = stmt.get(req.params.id);
+	if (info === undefined) {
 		res.status(404).json({"message":"User does not exist. (404)"})
 	} else {
-		res.status(200).json(result)
+		res.status(200).json(info)
 	}
 })
 
 // UPDATE a single user (HTTP method PATCH) at endpoint /app/update/user/:id
 app.patch("/app/update/user/:id", (req, res) => {
-	const stmt = db.prepare("UPDATE userinfo SET user = COALESCE(?, user), pass = COALESCE(?, pass) WHERE id = /");
+	const stmt = db.prepare("UPDATE userinfo SET user = COALESCE(?, user), pass = COALESCE(?, pass) WHERE id = ?");
 	const info = stmt.run(req.body.user, md5(req.body.pass), req.params.id);
 	if (info.changes === 1) {
 		res.status(200).json({"message":"One record update: ID " + req.params.id + " (200)"})
